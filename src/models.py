@@ -7,26 +7,65 @@ from eralchemy2 import render_er
 
 Base = declarative_base()
 
-class Person(Base):
-    __tablename__ = 'person'
-    # Here we define columns for the table person
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
-
-class Address(Base):
-    __tablename__ = 'address'
-    # Here we define columns for the table address.
-    # Notice that each column is also a normal Python instance attribute.
-    id = Column(Integer, primary_key=True)
-    street_name = Column(String(250))
-    street_number = Column(String(250))
-    post_code = Column(String(250), nullable=False)
-    person_id = Column(Integer, ForeignKey('person.id'))
-    person = relationship(Person)
+class Users(Base):
+    __tablename__ = 'users'
+    id = Column(Integer, primary_key = True)
+    full_name = Column(String, nullable = False)
+    email = Column(String, nullable = False, unique = True)
+    password = Column(String, nullable = False)
+    born_date = Column(Integer, nullable = False)
 
     def to_dict(self):
-        return {}
+        return {
+            "id": self.id,
+            "email": self.email,
+            "password": self.password,
+            "born_date": self.born_date
+        }
+    
+
+class Posts(Base):
+     __tablename__ = 'posts'
+     id = Column(Integer, primary_key = True)
+     title = Column(String, nullable = False)
+     content = Column(String, nullable = False)
+     user_id = Column(Integer, ForeignKey('users.id'))
+     user = relationship('Users', backref = 'posts' )
+
+     def to_dict(self):
+         return {
+             "id": self.id,
+             "title": self.title,
+             "content": self.content
+         }
+
+class Comments(Base):
+     __tablename__ = 'comments'
+     id = Column(Integer, primary_key = True)
+     content = Column(String, nullable = False)
+     user_id = Column(Integer, ForeignKey('users.id'))
+     user = relationship('Users', backref = 'comments' )
+
+     def to_dict(self):
+         return {
+             "id": self.id,
+             "content": self.content
+         }
+class Medias(Base):
+     __tablename__ = 'medias'
+     id = Column(Integer, primary_key = True)
+     src = Column(String, nullable = False)
+     post_id = Column(Integer, ForeignKey('posts.id'))
+     post = relationship('Posts', backref = 'medias' )
+
+     def to_dict(self):
+         return {
+             "id": self.id,
+             "src": self.src
+         }
+    
+
+    
 
 ## Draw from SQLAlchemy base
 try:
